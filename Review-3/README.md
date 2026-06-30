@@ -1,8 +1,8 @@
 # FlowForge: Comprehensive Platform & Infrastructure Documentation
 
-![FlowForge App Architecture](../FlowForge/App%20Architecture.png)
-![Kubernets Architecture](../FlowForge-Helm/Kubernets%20White.png)
-![IaC Architecture](../FlowForge-Terraform/Cloud%20white.png)
+![FlowForge App Architecture](./App%20Architecture.png)
+![Kubernets Architecture](./Kubernets%20White.png)
+![IaC Architecture](./Cloud%20white.png)
 
 This document is the **Single Source of Truth** for the entire FlowForge ecosystem. It integrates the application architecture, Terraform infrastructure, Helm/Kubernetes deployments, and the comprehensive set of GitOps CI/CD workflows used to run this Microsoft-Native Self-Hosted Project Management Suite.
 
@@ -13,6 +13,24 @@ This document is the **Single Source of Truth** for the entire FlowForge ecosyst
 FlowForge is a decoupled, multi-tenant microservices platform tailored for DevOps training. It integrates natively with Azure services (Entra ID, PostgreSQL Flexible Server, Azure Cache for Redis, Azure AI Foundry, Blob Storage, Key Vault) leveraging **Passwordless Authentication** via Managed Identities.
 
 ### 1.1 Microservices Layout
+
+```mermaid
+graph TD
+    A[Frontend Next.js] -->|:3000| B[Gateway :8000]
+    B -->|JWT Validation| C[Auth Service :8001]
+    B --> D[Project Service :8002]
+    B --> E[Task Service :8003]
+    B --> F[Analysis Service :8004]
+    
+    C --> G[(Redis)]
+    D --> G
+    E --> G
+    F --> G
+    
+    G --> H[Notification Worker]
+    H -->|SMTP| I[Email Notifications]
+```
+
 - **`frontend`** (Next.js 14): React App Router UI. Entra SSO params are baked in at build time.
 - **`gateway`** (FastAPI): BFF Proxy handling JWT validation, Redis rate limiting, CORS, routing, and header injection (`X-User-ID`, `X-Org-ID`).
 - **`auth-service`** (FastAPI): User management, Entra ID SSO, invitations, refresh tokens.
